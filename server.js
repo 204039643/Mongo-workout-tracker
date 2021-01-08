@@ -1,108 +1,91 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const logger = require("morgan");
-const connection = mongoose.connection;
-const db = require("./models")
-const PORT = process.env.PORT || 3002;
-const app = express();
+const express = require('express')
+const mongoose = require('mongoose')
+const logger = require('morgan')
+const connection = mongoose.connection
+const db = require('./models')
+const PORT = process.env.PORT || 3002
+const app = express()
+const path = require('path')
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static("./public"));
-app.use(logger("dev"));
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(express.static('./public'))
+app.use(logger('dev'))
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/workout', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
-  useFindAndModify: false,
+  useFindAndModify: false
+})
+
+app.listen(PORT, () => {
+  console.log(`app running on PORT ${PORT}`)
+})
+
+//View routes
+
+app.get("/exercise", (req, res) => {
+  res.sendFile(path.join(__dirname, "../Mongo-workout-tracker/public/exercise.html"));
 });
 
-app.listen(PORT, ()=> {console.log(`app running on PORT ${PORT}`)});
+app.get("/stats", (req, res) => {
+  res.sendFile(path.join(__dirname, "../Mongo-workout-tracker/public/stats.html"));
+});
 
-// db.on("error", error => {
-//   console.log("Database Error:", error);
-// });
+//API Routes
 
 //Get Last Workout
-app.get("/api/workouts", (req, res) => {
+app.get('/api/workouts', (req, res) => {
   db.Workout.find({})
     .then(dbWorkout => {
-      res.json(dbWorkout);
+      res.json(dbWorkout)
     })
     .catch(err => {
-      res.json(err);
-    });
-});
-
-// app.post("/submit", ({ body }, res) => {
-//   const book = body;
-
-//   book.read = false;
-
-//   db.books.save(book, (error, saved) => {
-//     if (error) {
-//       console.log(error);
-//     } else {
-//       res.send(saved);
-//     }
-//   });
-// });
+      res.json(err)
+    })
+})
 
 
-// app.get("/unread", (req, res) => {
-//   db.books.find({ read: false }, (error, found) => {
-//     if (error) {
-//       console.log(error);
-//     } else {
-//       res.json(found);
-//     }
-//   });
-// });
+//Add exercise
 
-// app.put("/markread/:id", ({ params }, res) => {
-//   db.books.update(
-//     {
-//       _id: mongojs.ObjectId(params.id)
-//     },
-//     {
-//       $set: {
-//         read: true
-//       }
-//     },
+app.put('/api/workouts/', async (req, res) => {
+  const { error } = validate(req.body)
+  if (error) {
+    return res.status(400).send(error.details[0].message)
+  }
 
-//     (error, edited) => {
-//       if (error) {
-//         console.log(error);
-//         res.send(error);
-//       } else {
-//         console.log(edited);
-//         res.send(edited);
-//       }
-//     }
-//   );
-// });
+  const exercise = await Platform.findByIdAndUpdate(
+    req.params.id,
+    { name: req.body.name },
+    {
+      new: true
+    }
+  )
 
-// app.put("/markunread/:id", ({ params }, res) => {
-//   db.books.update(
-//     {
-//       _id: mongojs.ObjectId(params.id)
-//     },
-//     {
-//       $set: {
-//         read: false
-//       }
-//     },
+  res.send(exercise)
+})
 
-//     (error, edited) => {
-//       if (error) {
-//         console.log(error);
-//         res.send(error);
-//       } else {
-//         console.log(edited);
-//         res.send(edited);
-//       }
-//     }
-//   );
-// });
+//Create new workout
+app.post('/api/workouts', ({ body }, res) => {
+  const exercise = body
+  db.Workout.create(exercise, (error, saved) => {
+    if (error) {
+      console.log(error)
+    } else {
+      res.send(saved)
+    }
+  })
+})
+
+//Get workouts in range
+app.get('/api/workouts', (req, res) => {
+  db.Workout.find({})
+    .then(dbWorkout => {
+      res.json(dbWorkout)
+    })
+    .catch(err => {
+      res.json(err)
+    })
+})
 
