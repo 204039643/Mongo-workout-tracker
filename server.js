@@ -25,13 +25,17 @@ app.listen(PORT, () => {
 
 //View routes
 
-app.get("/exercise", (req, res) => {
-  res.sendFile(path.join(__dirname, "../Mongo-workout-tracker/public/exercise.html"));
-});
+app.get('/exercise', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '../Mongo-workout-tracker/public/exercise.html')
+  )
+})
 
-app.get("/stats", (req, res) => {
-  res.sendFile(path.join(__dirname, "../Mongo-workout-tracker/public/stats.html"));
-});
+app.get('/stats', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '../Mongo-workout-tracker/public/stats.html')
+  )
+})
 
 //API Routes
 
@@ -46,41 +50,33 @@ app.get('/api/workouts', (req, res) => {
     })
 })
 
-
 //Add exercise
 
-app.put('/api/workouts/', async (req, res) => {
-  const { error } = validate(req.body)
-  if (error) {
-    return res.status(400).send(error.details[0].message)
-  }
-
-  const exercise = await Platform.findByIdAndUpdate(
+app.put('/api/workouts/:id', (req, res) => {
+  console.log(req.body)
+  db.Workout.findByIdAndUpdate(
     req.params.id,
-    { name: req.body.name },
     {
-      new: true
-    }
-  )
-
-  res.send(exercise)
+      $push: { exercises: req.body }
+    },
+    { new: true }
+  ).then(dbWorkout => {
+    res.json(dbWorkout)
+  })
 })
 
-//Create new workout
-app.post('/api/workouts', ({ body }, res) => {
-  const exercise = body
-  db.Workout.create(exercise, (error, saved) => {
-    if (error) {
-      console.log(error)
-    } else {
-      res.send(saved)
-    }
+//Create workout
+app.post('/api/workouts', (req, res) => {
+  console.log(req.body)
+  db.Workout.create(req.body).then(saved => {
+    console.log('saved: ', saved)
+    res.send(saved)
   })
 })
 
 //Get workouts in range
-app.get('/api/workouts', (req, res) => {
-  db.Workout.find({})
+app.get('/api/workouts/range', (req, res) => {
+  db.Workout.find({}).limit(7)
     .then(dbWorkout => {
       res.json(dbWorkout)
     })
@@ -88,4 +84,3 @@ app.get('/api/workouts', (req, res) => {
       res.json(err)
     })
 })
-
