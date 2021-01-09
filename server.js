@@ -1,7 +1,7 @@
+//JS variables
 const express = require('express')
 const mongoose = require('mongoose')
 const logger = require('morgan')
-const connection = mongoose.connection
 const db = require('./models')
 const PORT = process.env.PORT || 3002
 const app = express()
@@ -50,8 +50,26 @@ app.get('/api/workouts', (req, res) => {
     })
 })
 
-//Add exercise
+//Aggregate route for get exercises
+app.get('/api/workouts', (req, res) => {
+  db.Workout.aggregate([
+    {
+      $addFields: {
+        totalDuration: {
+          $sum: '$exercises.duration',
+        },
+      },
+    },
+  ])
+    .then((dbWorkouts) => {
+      res.json(dbWorkouts);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 
+//Add exercise
 app.put('/api/workouts/:id', (req, res) => {
   console.log(req.body)
   db.Workout.findByIdAndUpdate(
@@ -76,7 +94,15 @@ app.post('/api/workouts', (req, res) => {
 
 //Get workouts in range
 app.get('/api/workouts/range', (req, res) => {
-  db.Workout.find({}).limit(7)
+  db.Workout.aggregate([
+    {
+      $addFields: {
+        totalDuration: {
+          $sum: '$exercises.duration',
+        },
+      },
+    },
+  ]).sort({ _id: -1 }).limit(7)
     .then(dbWorkout => {
       res.json(dbWorkout)
     })
