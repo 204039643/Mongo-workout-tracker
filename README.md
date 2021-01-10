@@ -24,7 +24,10 @@ Fullstack web app that allows you to track both cardio and resistance type worko
     
 ## Usage
     
-1. Open deployed in your favorite browser: HEROKU
+1. Open deployed in your favorite browser: https://stormy-wildwood-71625.herokuapp.com/
+2. On main page you will find stats stats from your last workout including totals. You can either: 1. Continue last workout by adding new exercises or 2. Create a new workout for the day.
+3. Continue workout - select either 'cardio' or 'resistance'. Complete all exercise fields for selected type and either click 'complete' to add workout and mark complete or 'add exercise' to add new record under existing workout.
+4. Select 'Stats' in Navbar to view charts of progress over the last 7 days for workout duration (minutes), weight lifted (pounds), exercised count completed per day.
     
 ## License
     
