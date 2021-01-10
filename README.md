@@ -2,6 +2,8 @@
 
 ![license badge](https://img.shields.io/badge/license-MIT-brightgreen)
 
+![app screenshot](public/Mongo-fitness-tracker-app-screenshot1.png)
+
 Fullstack web app that allows you to track both cardio and resistance type workouts on a daily basis. Workout totals including duration, reps, distance, etc. are provided as exercises are added and completed with exercise data being stored in a Mongo dB. A stats view is provided to allow you see progress over the last 7 days for workout duration (minutes), weight lifted (pounds), exercised count completed per day. Mongo DB with an express server in node.js is used to persist data while mongoose is used as an ODM for data modelling.
     
 - [Installation](#installation)
