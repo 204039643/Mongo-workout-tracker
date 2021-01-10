@@ -71,7 +71,6 @@ app.get('/api/workouts', (req, res) => {
 
 //Add exercise
 app.put('/api/workouts/:id', (req, res) => {
-  console.log(req.body)
   db.Workout.findByIdAndUpdate(
     req.params.id,
     {
@@ -85,9 +84,7 @@ app.put('/api/workouts/:id', (req, res) => {
 
 //Create workout
 app.post('/api/workouts', (req, res) => {
-  console.log(req.body)
   db.Workout.create(req.body).then(saved => {
-    console.log('saved: ', saved)
     res.send(saved)
   })
 })
